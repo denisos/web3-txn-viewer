@@ -1,13 +1,13 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import { TransactionProvider } from '../../contexts/transaction-context';
+import { TransactionProvider, TransactionContextType } from '../../contexts/transaction-context';
 import TransactionList from './TransactionList';
 import { NearTransaction } from '../../types/types';
 import { data } from '../../mocks/transactions';
 
 // helpers
-function renderTransactionsList(ctx: any) {
+function renderTransactionsList(ctx: TransactionContextType) {
   return render(
     <TransactionProvider value={ctx}>
       <TransactionList />

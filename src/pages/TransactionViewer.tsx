@@ -9,7 +9,7 @@ const TransactionViewerStyle = styled.div`
   border-radius: ${props => props.theme.radius};
 `;
 
-export default function TransactionViewer() {
+export default function TransactionViewer(): JSX.Element {
 
   return (
     <TransactionViewerStyle>

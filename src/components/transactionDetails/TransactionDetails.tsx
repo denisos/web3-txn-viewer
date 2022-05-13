@@ -25,7 +25,7 @@ interface TransactionDetailsProps {
   transaction: NearTransaction;
 }
 
-export default function TransactionDetails({ transaction }: TransactionDetailsProps) {
+export default function TransactionDetails({ transaction }: TransactionDetailsProps): JSX.Element {
 
   return (
     <TransactionDetailsStyle>

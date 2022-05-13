@@ -3,11 +3,15 @@ import { NearTransaction } from '../types/types';
 
 import { data } from '../mocks/transactions';
 
-type TransactionContextType = {
+export type TransactionContextType = {
   transactions: NearTransaction[],
   loading: boolean,
   error: boolean
-}
+};
+
+type TransactionProviderProps = {
+  children: React.ReactNode
+};
 
 const TransactionContext = createContext<TransactionContextType | undefined>(undefined);
 
@@ -19,14 +23,22 @@ function useTransactions() {
   return context;
 }
 
+// function TransactionProvider({ children }: TransactionProviderProps) {
+// function TransactionProvider(props: React.PropsWithChildren<{}>) {
 function TransactionProvider(props: any) {
-  const [ transactions, setTransactions ] = useState(data);
+  const [ transactions, setTransactions ] = useState<NearTransaction[]>(data as NearTransaction[]);
   const [ loading, setLoading ] = useState(false);
   const [ error, setError ] = useState(false);
 
-  const value = { transactions, loading, error };
+  const value = { 
+    transactions,
+    loading,
+    error
+  };
   
-  return <TransactionContext.Provider value={value} {...props} />
+  return (
+    <TransactionContext.Provider value={value} {...props} />
+  );
 }
 
 export { TransactionProvider, useTransactions };

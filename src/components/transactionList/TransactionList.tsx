@@ -20,7 +20,7 @@ const TransactionListStyle = styled.div`
   min-height: 120px;
 `;
 
-export default function TransactionList() {
+export default function TransactionList(): JSX.Element {
   const { transactions, loading, error } = useTransactions();
   const [ transactionIndex, setTransactionIndex ] = useState<number>(0);
 

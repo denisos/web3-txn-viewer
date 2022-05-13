@@ -6,8 +6,11 @@ const BasicMessageStyle = styled.div`
   justify-content: center;
 `;
 
-export default function BasicMessage({children}: {children: any}) {
+interface BasicMessageProps {
+  children:  React.ReactNode;
+}
 
+export default function BasicMessage({ children }: BasicMessageProps): JSX.Element {
   return (
     <BasicMessageStyle>{children}</BasicMessageStyle>
   )

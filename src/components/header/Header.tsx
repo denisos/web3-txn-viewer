@@ -5,8 +5,11 @@ const H1Header = styled.h1`
   text-align: center;
 `;
 
+interface HeaderProps {
+  children:  React.ReactNode;
+}
 
-export default function Header({ children }: any) {
+export default function Header({ children }: HeaderProps): JSX.Element {
 
   return (
     <header>
