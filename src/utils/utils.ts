@@ -1,4 +1,5 @@
 import { NearTransaction, ActionTypeEnum } from '../types/types';
+import BigNumber from "bignumber.js";
 
 export const isSuccessfulTransaction = (transaction: NearTransaction) => 
   transaction?.success || false;
@@ -21,3 +22,9 @@ export const compareDatesAsc = (dateA: string, dateB: string) => {
 export const compareTransactionTimesAsc = 
   (transactionA: NearTransaction, transactionB: NearTransaction) => 
     compareDatesAsc(transactionA.time, transactionB.time);
+
+export const scaleToFactor = (value: string, factor = 24): string  => {
+  // see https://mikemcl.github.io/bignumber.js/
+  const bigNum = new BigNumber(value);
+  return bigNum.dividedBy(10 ** factor).toString();
+};

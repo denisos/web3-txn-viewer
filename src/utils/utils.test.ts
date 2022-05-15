@@ -3,7 +3,8 @@ import {
   isSuccessfulTransaction, 
   isTransferTransaction,
   compareDatesAsc,
-  compareTransactionTimesAsc
+  compareTransactionTimesAsc,
+  scaleToFactor
 } from './utils'
 import { NearTransaction } from '../types/types';
 
@@ -146,5 +147,24 @@ describe('compareTransactionTimes', () => {
     // after sort, oldest is now first in the resulting list
     expect(sortedAscList[0].id).toBe(mockOlderTransaction.id);
     expect(sortedAscList[1].id).toBe(mockFunctionCallTransaction.id);
+  });
+});
+
+
+describe('scaleToFactor', () => {
+  test('should return as expected when scale to 24 and passed string', () => {              
+    expect(scaleToFactor('716669915088987500000000000')).toBe('716.6699150889875');
+  });
+
+  test('should return as expected when scale to 24 and passed number', () => {
+    expect(scaleToFactor('716669915088987512345677899')).toBe('716.66991508898751234568');
+  });
+
+  test('should return as expected when scale to 24', () => {
+    expect(scaleToFactor('1100000000000000000000000', 24)).toBe('1.1');
+  });
+
+  test('should return as expected when scale to 24 when passed 0', () => {
+    expect(scaleToFactor('0', 24)).toBe('0');
   });
 });

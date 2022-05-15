@@ -24,6 +24,7 @@ export default function TransactionList(): JSX.Element {
   const { transactions, loading, error } = useTransactions();
   const [ transactionIndex, setTransactionIndex ] = useState<number>(0);
 
+  // memoize and only regen when transactions ref changes
   const successfulSortedTransfers: NearTransaction[] = useMemo(() => {
     return transactions
       .filter(filterSuccessfulTransfers)

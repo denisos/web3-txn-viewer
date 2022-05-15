@@ -1,5 +1,6 @@
 import styled from 'styled-components';
-import { NearTransaction } from '../../types/types';
+import { NearTransaction, Transfer } from '../../types/types';
+import { scaleToFactor } from '../../utils/utils';
 
 const TransactionDetailsStyle = styled.dl`
   color: ${props => props.theme.yellow};
@@ -26,6 +27,15 @@ interface TransactionDetailsProps {
 }
 
 export default function TransactionDetails({ transaction }: TransactionDetailsProps): JSX.Element {
+  // only Transfer actions will be passed to this component
+  const action: Transfer = transaction.actions[0] as Transfer;
+  let deposit = action?.data?.deposit;
+  if (deposit) {
+    deposit = scaleToFactor(deposit);
+    deposit = `${deposit} NEAR`;
+  } else {
+    deposit = '';
+  }
 
   return (
     <TransactionDetailsStyle>
@@ -36,7 +46,7 @@ export default function TransactionDetails({ transaction }: TransactionDetailsPr
       <TransactionValueStyle>{transaction.receiver}</TransactionValueStyle>
 
       <TransactionKeyStyle>Deposit</TransactionKeyStyle>
-      <TransactionValueStyle>{transaction.id}</TransactionValueStyle>
+      <TransactionValueStyle>{deposit}</TransactionValueStyle>
 
       <TransactionKeyStyle>Time</TransactionKeyStyle>
       <TransactionValueStyle>{transaction.time}</TransactionValueStyle>
