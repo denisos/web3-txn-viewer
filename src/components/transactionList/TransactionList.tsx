@@ -1,17 +1,17 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import styled from 'styled-components';
 
 import { useTransactions } from '../../contexts/transaction-context';
 import TransactionDetails from '../../components/transactionDetails/TransactionDetails';
 import BasicMessage from './BasicMessage';
+import { NearTransaction } from '../../types/types';
+import { filterSuccessfulTransfers, compareTransactionTimesAsc } from '../../utils/utils';
 
-function showMessage(text: string) {
-  return (
-    <TransactionListStyle>
-      <BasicMessage>{text}</BasicMessage>
-    </TransactionListStyle>
-  );
-}
+const showMessage = (text: string) => (
+  <TransactionListStyle>
+    <BasicMessage>{text}</BasicMessage>
+  </TransactionListStyle>
+);
 
 const TransactionListStyle = styled.div`
   background-color: ${props => props.theme.dark};
@@ -24,8 +24,15 @@ export default function TransactionList(): JSX.Element {
   const { transactions, loading, error } = useTransactions();
   const [ transactionIndex, setTransactionIndex ] = useState<number>(0);
 
-  const atStart = transactionIndex < 1;
-  const atEnd = transactionIndex === transactions.length - 1;
+  const successfulSortedTransfers: NearTransaction[] = useMemo(() => {
+    return transactions
+      .filter(filterSuccessfulTransfers)
+      .sort((transactionA, transactionB) => 
+        compareTransactionTimesAsc(transactionA, transactionB))
+  }, [transactions]);
+
+  const isPreviousDisabled = transactionIndex <= 0;
+  const isNextDisabled = (transactionIndex + 1) >= successfulSortedTransfers.length;
 
   const handlePreviousOnClick = () => {
     if (transactionIndex > 0) {
@@ -34,34 +41,30 @@ export default function TransactionList(): JSX.Element {
   };
 
   const handleNextOnClick = () => {
-    if (transactionIndex <= transactions.length) {
+    if (transactionIndex < successfulSortedTransfers.length) {
       setTransactionIndex(previous => previous + 1);
     }
   };
-
-
-  // console.log("transactions are ", transactions);
-  // console.log("transactionIndex ", transactionIndex);
 
   if (loading) {
     return showMessage("Loading transactions...");
   }
 
-  if (error) {
+  if (!transactions || error) {
     return showMessage("Sorry, an Error happened. Try reloading.");
   }
 
-  if (transactions?.length <= 0) {
-    return showMessage("Sorry, no transactions returned from the graph.");
+  if (successfulSortedTransfers?.length <= 0) {
+    return showMessage("Sorry, no successful Transfer transactions returned from the graph.");
   }
 
   return (
     <TransactionListStyle>
-      <TransactionDetails transaction={transactions[transactionIndex]} />
+      <TransactionDetails transaction={successfulSortedTransfers[transactionIndex]} />
 
-      <button onClick={handlePreviousOnClick} disabled={atStart}>Previous</button>
+      <button onClick={handlePreviousOnClick} disabled={isPreviousDisabled}>Previous</button>
 
-      <button onClick={handleNextOnClick} disabled={atEnd}>Next</button>
+      <button onClick={handleNextOnClick} disabled={isNextDisabled}>Next</button>
     </TransactionListStyle>
   );
 }

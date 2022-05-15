@@ -38,6 +38,9 @@ export default function TransactionDetails({ transaction }: TransactionDetailsPr
       <TransactionKeyStyle>Deposit</TransactionKeyStyle>
       <TransactionValueStyle>{transaction.id}</TransactionValueStyle>
 
+      <TransactionKeyStyle>Time</TransactionKeyStyle>
+      <TransactionValueStyle>{transaction.time}</TransactionValueStyle>
+
     </TransactionDetailsStyle>
   );
 }

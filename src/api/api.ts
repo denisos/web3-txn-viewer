@@ -9,6 +9,6 @@ import { NearTransaction } from '../types/types';
 const baseUrl = `http://figment-mock-data.figment.network`;
 const SECRET_API_KEY = 'SECRET_API_KEY';
 
-export function getTransactions(): Promise<NearTransaction[] | Error>  {
+export function getTransactions(): Promise<NearTransaction[]>  {
   return fwap.get<NearTransaction[]>(`${baseUrl}/near/transactions?api_key=${SECRET_API_KEY}`);
 }

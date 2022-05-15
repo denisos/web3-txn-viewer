@@ -1,18 +1,44 @@
 
-export enum ActionType {
+export enum ActionTypeEnum {
   FunctionCall = 'FunctionCall',
   Transfer = 'Transfer',
   AddKey = 'AddKey'
 }
 
-export type Action = {
-  data: {
-    gas?: number;
-    deposit: string;
-    method_name?: string;    
-  }
+export type ActionType = 'Transfer' | 'FunctionCall' | 'AddKey';
+
+type Action = {
   type: ActionType,
 }
+
+export type Transfer = Action & {
+  data: {
+    deposit: string;
+  };
+  type: 'Transfer';
+}
+
+export type FunctionCall = Action & {
+  data: {
+    gas: number;
+    deposit: string;
+    method_name: string;
+  };
+  type: 'FunctionCall';
+}
+
+export type AddKey = Action & {
+  data: {
+    access_key: {
+      nonce: number;
+      permission: string;
+    }
+    public_key: string;  
+  };
+  type: 'AddKey'
+}
+
+type TransactionAction = Transfer | FunctionCall | AddKey;
 
 export type NearTransaction = {
   id: number;
@@ -25,7 +51,7 @@ export type NearTransaction = {
   sender: string;
   receiver: string;
   gas_burnt: string;
-  actions: Action[];
+  actions: TransactionAction[];
   actions_count: number;
   success: boolean;
 }

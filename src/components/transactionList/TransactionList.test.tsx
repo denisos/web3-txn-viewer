@@ -45,7 +45,7 @@ describe('TransactionsList', () => {
 
     renderTransactionsList(ctx)
 
-    expect(screen.getByText(/no transactions returned/i)).toBeInTheDocument();
+    expect(screen.getByText(/no successful Transfer transactions/i)).toBeInTheDocument();
   });
 
   test('should render when one transaction only, nav buttons disabled', () => {
@@ -70,8 +70,12 @@ describe('TransactionsList', () => {
     expect(screen.getByText(/Sender/i)).toBeInTheDocument();
     expect(screen.getByText(/Receiver/i)).toBeInTheDocument();
     expect(screen.getByText(/Deposit/i)).toBeInTheDocument();
-    expect(screen.getByText(data[0].sender)).toBeInTheDocument();
-    expect(screen.getByText(data[0].receiver)).toBeInTheDocument();
+
+    // important: transactions are filtered and ordered by oldest first which is the 3rd
+    //  (i.e. last) entry in the mock data
+    // and there are only 2 successful Trasnfers in the mock data
+    expect(screen.getByText(data[3].sender)).toBeInTheDocument();
+    expect(screen.getByText(data[3].receiver)).toBeInTheDocument();
     // to-do:
     // expect(screen.getByText(data[0].??deposit??)).toBeInTheDocument();
 
@@ -79,12 +83,12 @@ describe('TransactionsList', () => {
     expect(screen.getByRole('button', { name: /previous/i })).toBeDisabled();
     expect(screen.getByRole('button', { name: /next/i })).toBeEnabled();
 
-    // click next and now previous is enabled
+    // click next and now previous is enabled and next disab;ed
     await userEvent.click(screen.getByRole('button', { name: /next/i }));
     expect(screen.getByRole('button', { name: /previous/i })).toBeEnabled();
-    expect(screen.getByRole('button', { name: /next/i })).toBeEnabled();
+    expect(screen.getByRole('button', { name: /next/i })).toBeDisabled();
 
-    // click previous, back at start so previous is once again disabled
+    // click previous, back at start so previous is once again disabled and next enabled
     await userEvent.click(screen.getByRole('button', { name: /previous/i }));
     expect(screen.getByRole('button', { name: /previous/i })).toBeDisabled();
     expect(screen.getByRole('button', { name: /next/i })).toBeEnabled();
