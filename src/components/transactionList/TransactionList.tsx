@@ -6,6 +6,7 @@ import TransactionDetails from '../../components/transactionDetails/TransactionD
 import BasicMessage from './BasicMessage';
 import { NearTransaction } from '../../types/types';
 import { filterSuccessfulTransfers, compareTransactionTimesAsc } from '../../utils/utils';
+import { Button } from '../button/Button';
 
 const showMessage = (text: string) => (
   <TransactionListStyle>
@@ -18,6 +19,12 @@ const TransactionListStyle = styled.div`
   border-radius: ${props => props.theme.radius};
   min-width: 700px;
   min-height: 120px;
+`;
+
+const TransactionListButtonsBox = styled.div`
+  margin: 10px;
+  display: flex;
+  justify-content: space-around;
 `;
 
 export default function TransactionList(): JSX.Element {
@@ -63,9 +70,11 @@ export default function TransactionList(): JSX.Element {
     <TransactionListStyle>
       <TransactionDetails transaction={successfulSortedTransfers[transactionIndex]} />
 
-      <button onClick={handlePreviousOnClick} disabled={isPreviousDisabled}>Previous</button>
+      <TransactionListButtonsBox>
+        <Button onClick={handlePreviousOnClick} disabled={isPreviousDisabled}>Previous</Button>
 
-      <button onClick={handleNextOnClick} disabled={isNextDisabled}>Next</button>
+        <Button onClick={handleNextOnClick} disabled={isNextDisabled}>Next</Button>
+      </TransactionListButtonsBox>
     </TransactionListStyle>
   );
 }

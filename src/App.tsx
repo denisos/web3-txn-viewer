@@ -10,7 +10,7 @@ const AppStyle = styled.div`
   align-items: center;
   margin: 0;
   padding: 0;
-  background-color: #f1f1f1;
+  background-color: ${props => props.theme.gray};
 `;
 
 

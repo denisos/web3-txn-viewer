@@ -6,7 +6,8 @@ import App from './App';
 
 const theme = {
   yellow: '#FFF29B',
-  dark: 'rgb(33, 37, 41)',
+  dark: '#212529',
+  gray: `#f1f1f1`,
   radius: '4px',
 }
 
