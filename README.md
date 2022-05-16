@@ -10,7 +10,10 @@ Scaffolded using Create React App.
 
 ### install
 `nvm use`   
+
 `yarn`
+
+### run
 `yarn start`
 
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
@@ -25,7 +28,7 @@ Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 Builds the app for production to the `build` folder. See CRA docs for more.
 
 
-## Design Decisions
+## Design Decisions for this App
 - I made decisions based on the api data available to me (which I know is limited) and requirements.
 - I do not filter and sort the transaction data as part of the main fetch because I consider that particular to the view, the TransactionList component e.g. maybe a control would be added to that view to sort differently newest first. There may also in the future be other views which would list all transactions with actions that are function calls. So I prefer to keep the raw transaction list as it was fetched and let consumers filter etc. 
 - I used react context as container to fetch and share transactions state. I could also have used a hook but I think context and provider allow sharing common data and logic for this and future views.
