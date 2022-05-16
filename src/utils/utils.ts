@@ -28,3 +28,18 @@ export const scaleToFactor = (value: string, factor = 24): string  => {
   const bigNum = new BigNumber(value);
   return bigNum.dividedBy(10 ** factor).toString();
 };
+
+export const scaleDepositAsNear = (deposit: string) => {
+  if (deposit) {
+    deposit = scaleToFactor(deposit);
+    return`${deposit} NEAR`;
+  }
+  return '';
+}
+
+// just using a simple rule now but a more robust solution would be to check the first
+//  transaction in both lists ids and/or timestamps
+export const isDifferentTransactionLists =
+  (oldList: NearTransaction[], newList: NearTransaction[]) => {
+  return (newList.length > oldList.length);
+}

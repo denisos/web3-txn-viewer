@@ -4,7 +4,8 @@ import {
   isTransferTransaction,
   compareDatesAsc,
   compareTransactionTimesAsc,
-  scaleToFactor
+  scaleToFactor,
+  scaleDepositAsNear
 } from './utils'
 import { NearTransaction } from '../types/types';
 
@@ -167,4 +168,8 @@ describe('scaleToFactor', () => {
   test('should return as expected when scale to 24 when passed 0', () => {
     expect(scaleToFactor('0', 24)).toBe('0');
   });
+});
+
+test('should scaleDepositAsNear return as scaled NEAR', () => {
+  expect(scaleDepositAsNear('716669915088987500000000000')).toBe('716.6699150889875 NEAR');
 });

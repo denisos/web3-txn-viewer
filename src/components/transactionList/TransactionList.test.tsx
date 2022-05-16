@@ -5,6 +5,7 @@ import { TransactionProvider, TransactionContextType } from '../../contexts/tran
 import TransactionList from './TransactionList';
 import { NearTransaction } from '../../types/types';
 import { data } from '../../mocks/transactions';
+import { scaleDepositAsNear } from '../../utils/utils';
 
 // helpers
 function renderTransactionsList(ctx: TransactionContextType) {
@@ -76,8 +77,9 @@ describe('TransactionsList', () => {
     // and there are only 2 successful Trasnfers in the mock data
     expect(screen.getByText(data[3].sender)).toBeInTheDocument();
     expect(screen.getByText(data[3].receiver)).toBeInTheDocument();
-    // to-do:
-    // expect(screen.getByText(data[0].??deposit??)).toBeInTheDocument();
+    expect(screen.getByText(scaleDepositAsNear(data[3].actions[0].data.deposit)))
+      .toBeInTheDocument();
+
 
     // previous disabled and next enabled
     expect(screen.getByRole('button', { name: /previous/i })).toBeDisabled();

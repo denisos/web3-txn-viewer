@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { NearTransaction } from '../types/types';
 import { getTransactions } from '../api/api';
+import { isDifferentTransactionLists } from '../utils/utils';
 
 export type TransactionContextType = {
   transactions: NearTransaction[],
@@ -11,6 +12,9 @@ export type TransactionContextType = {
 type TransactionProviderProps = {
   children: React.ReactNode
 };
+
+const POLLING_INTERVAL = 1000 * 20; // polls the api every 20 seconds
+const POLLING_ERROR_THRESHOLD = 4;  // stop polling after 4 consecutive polling failures
 
 const TransactionContext = createContext<TransactionContextType | undefined>(undefined);
 
@@ -29,13 +33,14 @@ function TransactionProvider(props: any) {
   const [ transactions, setTransactions ] = useState<NearTransaction[]>([]);
   const [ loading, setLoading ] = useState(false);
   const [ error, setError ] = useState(false);
+  const [ pollingErrorCount, setPollingErrorCount] = useState(0);
+  const [ timerId, setTimerId ] = useState<NodeJS.Timer>();
 
-  async function fetch() {
-    // console.log("context running fetch")
+  async function initialFetch() {
     setError(false);
     setLoading(true);
     try {
-      const data = await getTransactions();
+      const data: NearTransaction[] = await getTransactions();
       setTransactions(data);
       setLoading(false);
     } catch(error) {
@@ -43,15 +48,48 @@ function TransactionProvider(props: any) {
     }
   }
 
+  // different logic when polling than initial fetch
+  const pollingFetch = async () => {
+    // exit if already in error or loading state
+    if (error || loading) {
+      return;
+    }
+
+    try {
+      const newTransactions = await getTransactions();
+      setPollingErrorCount(0); // success so, reset count
+
+      // check if any new transactions have been received, if not then no
+      //  need to update the current list of transactions
+      if (isDifferentTransactionLists(transactions, newTransactions)) {
+        setTransactions(newTransactions);
+      } 
+    } catch(error) {
+      // it's polling every 20 seconds, so assume some few failures are ok but if 
+      //  exceed error threshold then set error state for ui to handle
+      setPollingErrorCount(prevCount => {
+        if (prevCount > POLLING_ERROR_THRESHOLD) {
+          setTimerId(prevTimerId => {
+            clearInterval(prevTimerId)
+            return prevTimerId;
+          })
+
+          setError(true);
+        }
+        return prevCount + 1;
+      });
+    }
+  };
+
   // fetch data to start, then kickoff interval polling
   useEffect(() => {
-    // console.log("context running useEffect")
-    fetch(); 
+    initialFetch(); 
 
-    // const timerId = setInterval(fetch, 1000 * 5);
+    const aTimerId = setInterval(pollingFetch, POLLING_INTERVAL);
+    setTimerId(aTimerId);
 
-    // return () => clearInterval(timerId);
-  }, [])
+    return () => clearInterval(aTimerId);
+  }, []);
 
   const value = { 
     transactions,
