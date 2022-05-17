@@ -16,7 +16,7 @@ type TransactionProviderProps = {
 const POLLING_INTERVAL = 1000 * 20; // polls the api every 20 seconds
 const POLLING_ERROR_THRESHOLD = 4;  // stop polling after 4 consecutive polling failures
 
-const TransactionContext = createContext<TransactionContextType | undefined>(undefined);
+export const TransactionContext = createContext<TransactionContextType | undefined>(undefined);
 
 function useTransactions() {
   const context = useContext(TransactionContext);
@@ -26,10 +26,8 @@ function useTransactions() {
   return context;
 }
 
-// to-do: set this and fix ts error in test
-// function TransactionProvider({ children }: TransactionProviderProps) {
-// function TransactionProvider(props: React.PropsWithChildren<{}>) {
-function TransactionProvider(props: any) {
+// custom provide which fetches and polls and makes data available
+function TransactionProvider({ children }: TransactionProviderProps) {
   const [ transactions, setTransactions ] = useState<NearTransaction[]>([]);
   const [ loading, setLoading ] = useState(false);
   const [ error, setError ] = useState(false);
@@ -98,7 +96,9 @@ function TransactionProvider(props: any) {
   };
   
   return (
-    <TransactionContext.Provider value={value} {...props} />
+    <TransactionContext.Provider value={value}>
+      {children}
+    </TransactionContext.Provider>
   );
 }
 

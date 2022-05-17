@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import { TransactionProvider, TransactionContextType } from '../../contexts/transaction-context';
+import { TransactionContext, TransactionContextType } from '../../contexts/transaction-context';
 import TransactionList from './TransactionList';
 import { NearTransaction } from '../../types/types';
 import { data } from '../../mocks/transactions';
@@ -10,9 +10,9 @@ import { scaleDepositAsNear } from '../../utils/utils';
 // helpers
 function renderTransactionsList(ctx: TransactionContextType) {
   return render(
-    <TransactionProvider value={ctx}>
+    <TransactionContext.Provider value={ctx}>
       <TransactionList />
-    </TransactionProvider>
+    </TransactionContext.Provider>
   );
 }
 
