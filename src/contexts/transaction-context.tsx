@@ -1,12 +1,11 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { NearTransaction } from '../types/types';
+import { NearTransaction, LoadingState } from '../types/types';
 import { getTransactions } from '../api/api';
 import { isDifferentTransactionLists } from '../utils/utils';
 
 export type TransactionContextType = {
   transactions: NearTransaction[],
-  loading: boolean,
-  error: boolean
+  loadingState: LoadingState
 };
 
 type TransactionProviderProps = {
@@ -29,27 +28,26 @@ function useTransactions() {
 // custom provide which fetches and polls and makes data available
 function TransactionProvider({ children }: TransactionProviderProps) {
   const [ transactions, setTransactions ] = useState<NearTransaction[]>([]);
-  const [ loading, setLoading ] = useState(false);
-  const [ error, setError ] = useState(false);
+  const [ loadingState, setLoadingState ] = useState<LoadingState>(LoadingState.Loading);
+
   const [ pollingErrorCount, setPollingErrorCount] = useState(0);
   const [ timerId, setTimerId ] = useState<NodeJS.Timer>();
 
   async function initialFetch() {
-    setError(false);
-    setLoading(true);
+    setLoadingState(LoadingState.Loading);
     try {
       const data: NearTransaction[] = await getTransactions();
       setTransactions(data);
-      setLoading(false);
+      setLoadingState(LoadingState.Success);
     } catch(error) {
-      setError(true);
+      setLoadingState(LoadingState.Error);
     }
   }
 
   // different logic when polling than initial fetch
   const pollingFetch = async () => {
-    // exit if already in error or loading state
-    if (error || loading) {
+    // exit not success state
+    if (loadingState !== LoadingState.Success) {
       return;
     }
 
@@ -72,7 +70,7 @@ function TransactionProvider({ children }: TransactionProviderProps) {
             return prevTimerId;
           })
 
-          setError(true);
+          setLoadingState(LoadingState.Error);
         }
         return prevCount + 1;
       });
@@ -91,8 +89,7 @@ function TransactionProvider({ children }: TransactionProviderProps) {
 
   const value = { 
     transactions,
-    loading,
-    error
+    loadingState
   };
   
   return (

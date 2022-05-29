@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 
 import { TransactionContext, TransactionContextType } from '../../contexts/transaction-context';
 import TransactionList from './TransactionList';
-import { NearTransaction } from '../../types/types';
+import { NearTransaction, LoadingState } from '../../types/types';
 import { data } from '../../mocks/transactions';
 import { scaleDepositAsNear } from '../../utils/utils';
 
@@ -16,17 +16,17 @@ function renderTransactionsList(ctx: TransactionContextType) {
   );
 }
 
-function buildContext(transactions: NearTransaction[], loading = false, error = false) {
+// function buildContext(transactions: NearTransaction[], loading = false, error = false) {
+function buildContext(transactions: NearTransaction[], loadingState: LoadingState) {
   return {
     transactions, 
-    loading,
-    error
+    loadingState
   }
 }
 
 describe('TransactionsList', () => {
   test('should render loading message view when loading', () => {
-    const ctx = buildContext([], true); 
+    const ctx = buildContext([], LoadingState.Loading); 
 
     renderTransactionsList(ctx)
 
@@ -34,7 +34,7 @@ describe('TransactionsList', () => {
   });
 
   test('should render error message view when error', () => {
-    const ctx = buildContext([], false, true);
+    const ctx = buildContext([], LoadingState.Error);
 
     renderTransactionsList(ctx)
 
@@ -42,7 +42,7 @@ describe('TransactionsList', () => {
   });
 
   test('should render no transactions message view when no transactions', () => {
-    const ctx = buildContext([]);
+    const ctx = buildContext([], LoadingState.Success);
 
     renderTransactionsList(ctx)
 
@@ -50,7 +50,7 @@ describe('TransactionsList', () => {
   });
 
   test('should render when one transaction only, nav buttons disabled', () => {
-    const ctx = buildContext([data[0] as NearTransaction]);
+    const ctx = buildContext([data[0] as NearTransaction], LoadingState.Success);
 
     renderTransactionsList(ctx)
 
@@ -64,7 +64,7 @@ describe('TransactionsList', () => {
 
   test('should render when multiple transactions', async () => {
 
-    const ctx = buildContext([...data as NearTransaction[]]);
+    const ctx = buildContext([...data as NearTransaction[]], LoadingState.Success);
 
     renderTransactionsList(ctx)
 

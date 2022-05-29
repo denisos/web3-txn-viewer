@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { useTransactions } from '../../contexts/transaction-context';
 import TransactionDetails from '../../components/transactionDetails/TransactionDetails';
 import BasicMessage from './BasicMessage';
-import { NearTransaction } from '../../types/types';
+import { NearTransaction, LoadingState } from '../../types/types';
 import { filterSuccessfulTransfers, compareTransactionTimesAsc } from '../../utils/utils';
 import { Button } from '../button/Button';
 
@@ -28,7 +28,7 @@ const TransactionListButtonsBox = styled.div`
 `;
 
 export default function TransactionList(): JSX.Element {
-  const { transactions, loading, error } = useTransactions();
+  const { transactions, loadingState } = useTransactions();
   const [ transactionIndex, setTransactionIndex ] = useState<number>(0);
 
   // memoize and only regen when transactions ref changes
@@ -54,11 +54,11 @@ export default function TransactionList(): JSX.Element {
     }
   };
 
-  if (loading) {
+  if (loadingState === LoadingState.Loading) {
     return showMessage("Loading transactions...");
   }
 
-  if (!transactions || error) {
+  if (!transactions || loadingState === LoadingState.Error) {
     return showMessage("Sorry, an Error happened. Try reloading.");
   }
 

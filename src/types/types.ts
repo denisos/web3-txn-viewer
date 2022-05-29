@@ -55,3 +55,9 @@ export type NearTransaction = {
   actions_count: number;
   success: boolean;
 }
+
+export enum LoadingState {
+  Loading = 'loading',
+  Error = 'error',
+  Success = 'success'
+}
