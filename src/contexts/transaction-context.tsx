@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useRef } from "react";
 import { NearTransaction, LoadingState } from '../types/types';
 import { getTransactions } from '../api/api';
 import { isDifferentTransactionLists } from '../utils/utils';
@@ -13,7 +13,7 @@ type TransactionProviderProps = {
 };
 
 const POLLING_INTERVAL = 1000 * 20; // polls the api every 20 seconds
-const POLLING_ERROR_THRESHOLD = 4;  // stop polling after 4 consecutive polling failures
+const POLLING_ERROR_THRESHOLD = 3;  // stop polling after 3 consecutive polling failures
 
 export const TransactionContext = createContext<TransactionContextType | undefined>(undefined);
 
@@ -30,8 +30,11 @@ function TransactionProvider({ children }: TransactionProviderProps) {
   const [ transactions, setTransactions ] = useState<NearTransaction[]>([]);
   const [ loadingState, setLoadingState ] = useState<LoadingState>(LoadingState.Loading);
 
-  const [ pollingErrorCount, setPollingErrorCount] = useState(0);
-  const [ timerId, setTimerId ] = useState<NodeJS.Timer>();
+  const pollingErrorCountRef = useRef(0);
+  // use ref since needed elsewhere of initial call to cancel
+  const timerIdRef = useRef<NodeJS.Timer>();
+
+  const setPollingErrorCount = (newValue: number) => pollingErrorCountRef.current = newValue;
 
   async function initialFetch() {
     setLoadingState(LoadingState.Loading);
@@ -53,7 +56,7 @@ function TransactionProvider({ children }: TransactionProviderProps) {
 
     try {
       const newTransactions = await getTransactions();
-      setPollingErrorCount(0); // success so, reset count
+      setPollingErrorCount(0);    // success so, reset error count
 
       // check if any new transactions have been received, if not then no
       //  need to update the current list of transactions
@@ -63,17 +66,13 @@ function TransactionProvider({ children }: TransactionProviderProps) {
     } catch(error) {
       // it's polling every 20 seconds, so assume some few failures are ok but if 
       //  exceed error threshold then set error state for ui to handle
-      setPollingErrorCount(prevCount => {
-        if (prevCount > POLLING_ERROR_THRESHOLD) {
-          setTimerId(prevTimerId => {
-            clearInterval(prevTimerId)
-            return prevTimerId;
-          })
-
-          setLoadingState(LoadingState.Error);
-        }
-        return prevCount + 1;
-      });
+      if (pollingErrorCountRef.current >= POLLING_ERROR_THRESHOLD) {
+        setLoadingState(LoadingState.Error)
+        clearInterval(timerIdRef.current);
+        setPollingErrorCount(0);
+      } else {
+        setPollingErrorCount(pollingErrorCountRef.current + 1);
+      }
     }
   };
 
@@ -81,10 +80,10 @@ function TransactionProvider({ children }: TransactionProviderProps) {
   useEffect(() => {
     initialFetch(); 
 
-    const aTimerId = setInterval(pollingFetch, POLLING_INTERVAL);
-    setTimerId(aTimerId);
+    const id = setInterval(pollingFetch, POLLING_INTERVAL);
+    timerIdRef.current = id;
 
-    return () => clearInterval(aTimerId);
+    return () => clearInterval(timerIdRef.current);
   }, []);
 
   const value = { 
