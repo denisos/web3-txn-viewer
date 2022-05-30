@@ -20,7 +20,8 @@ function renderTransactionsList(ctx: TransactionContextType) {
 function buildContext(transactions: NearTransaction[], loadingState: LoadingState) {
   return {
     transactions, 
-    loadingState
+    loadingState,
+    restartPolling: () => {}
   }
 }
 

@@ -6,7 +6,8 @@ import useInterval from '../hooks/useInterval';
 
 export type TransactionContextType = {
   transactions: NearTransaction[],
-  loadingState: LoadingState
+  loadingState: LoadingState,
+  restartPolling: () => void
 };
 
 type TransactionProviderProps = {
@@ -35,6 +36,9 @@ function TransactionProvider({ children }: TransactionProviderProps) {
   const pollingErrorCountRef = useRef(0);
 
   const setPollingErrorCount = (newValue: number) => pollingErrorCountRef.current = newValue;
+
+  // helper fn to restart polling if stopped due to error
+  const restartPolling = () => setIsPolling(true);
 
   async function initialFetch() {
     setLoadingState(LoadingState.Loading);
@@ -87,7 +91,8 @@ function TransactionProvider({ children }: TransactionProviderProps) {
 
   const value = { 
     transactions,
-    loadingState
+    loadingState,
+    restartPolling
   };
   
   return (
