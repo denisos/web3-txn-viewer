@@ -7,6 +7,7 @@ import BasicMessage from './BasicMessage';
 import { NearTransaction, LoadingState } from '../../types/types';
 import { filterSuccessfulTransfers, compareTransactionTimesAsc } from '../../utils/utils';
 import { Button } from '../button/Button';
+import useIterator from '../../hooks/useIterator';
 
 const showMessage = (text: string) => (
   <TransactionListStyle>
@@ -29,7 +30,6 @@ const TransactionListButtonsBox = styled.div`
 
 export default function TransactionList(): JSX.Element {
   const { transactions, loadingState } = useTransactions();
-  const [ transactionIndex, setTransactionIndex ] = useState<number>(0);
 
   // memoize and only regen when transactions ref changes
   const successfulSortedTransfers: NearTransaction[] = useMemo(() => {
@@ -39,19 +39,16 @@ export default function TransactionList(): JSX.Element {
         compareTransactionTimesAsc(transactionA, transactionB))
   }, [transactions]);
 
-  const isPreviousDisabled = transactionIndex <= 0;
-  const isNextDisabled = (transactionIndex + 1) >= successfulSortedTransfers.length;
+  const successfulTransfersIterator = 
+    useIterator<NearTransaction>(successfulSortedTransfers);
+
 
   const handlePreviousOnClick = () => {
-    if (transactionIndex > 0) {
-      setTransactionIndex(previous => previous - 1);
-    }
+    successfulTransfersIterator.prev();
   };
 
   const handleNextOnClick = () => {
-    if (transactionIndex < successfulSortedTransfers.length) {
-      setTransactionIndex(previous => previous + 1);
-    }
+    successfulTransfersIterator.next();
   };
 
   if (loadingState === LoadingState.Loading) {
@@ -62,18 +59,18 @@ export default function TransactionList(): JSX.Element {
     return showMessage("Sorry, an Error happened. Try reloading.");
   }
 
-  if (successfulSortedTransfers?.length <= 0) {
+  if (successfulTransfersIterator.isEmpty()) {
     return showMessage("Sorry, no successful Transfer transactions returned from the graph.");
   }
 
   return (
     <TransactionListStyle>
-      <TransactionDetails transaction={successfulSortedTransfers[transactionIndex]} />
+      {successfulTransfersIterator.current && <TransactionDetails transaction={successfulTransfersIterator.current} />}
 
       <TransactionListButtonsBox>
-        <Button onClick={handlePreviousOnClick} disabled={isPreviousDisabled}>Previous</Button>
+        <Button onClick={handlePreviousOnClick} disabled={successfulTransfersIterator.isFirst()}>Previous</Button>
 
-        <Button onClick={handleNextOnClick} disabled={isNextDisabled}>Next</Button>
+        <Button onClick={handleNextOnClick} disabled={successfulTransfersIterator.isLast()}>Next</Button>
       </TransactionListButtonsBox>
     </TransactionListStyle>
   );

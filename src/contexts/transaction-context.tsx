@@ -31,7 +31,7 @@ function useTransactions() {
 function TransactionProvider({ children }: TransactionProviderProps) {
   const [ transactions, setTransactions ] = useState<NearTransaction[]>([]);
   const [ loadingState, setLoadingState ] = useState<LoadingState>(LoadingState.Loading);
-  const [ isPolling, setIsPolling ] = useState(true);
+  const [ isPolling, setIsPolling ] = useState(false);
 
   const pollingErrorCountRef = useRef(0);
 
